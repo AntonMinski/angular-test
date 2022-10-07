@@ -15,7 +15,7 @@ export interface EditDialogMode {
    styleUrls: ['./main.component.scss'],
 })
 export class MainComponent implements OnInit {
-   username: string | null = ''
+   email: string | null = ''
    tenants: Tenant[] = []
 
    searchText = ''
@@ -26,7 +26,7 @@ export class MainComponent implements OnInit {
    constructor(public dialog: MatDialog) {}
 
    ngOnInit() {
-      this.username = localStorage.getItem('username')
+      this.email = localStorage.getItem('email')
       this.getTenants()
    }
 
@@ -86,7 +86,7 @@ export class MainComponent implements OnInit {
       this._rows.next(filtered)
    }
 
-   /* services */
+   /* _services */
    getTenants() {
       // TODO: connect to backend
    }

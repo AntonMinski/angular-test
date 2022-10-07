@@ -5,21 +5,21 @@
          <div>Name:</div>
          <input type="text" formControlName="name" />
          <div *ngIf="ngForm.submitted && editForm.controls.name.errors" class="invalid">
-            <div *ngIf="editForm.controls.name.errors.required">missing name</div>
+            <div *ngIf="editForm.controls.name.errors?.['required']">missing name</div>
          </div>
       </div>
       <div>
          <div>Phone:</div>
          <input type="number" formControlName="phone" />
          <div *ngIf="ngForm.submitted && editForm.controls.phone.errors" class="invalid">
-            <div *ngIf="editForm.controls.phone.errors.required">missing phone</div>
+            <div *ngIf="editForm.controls.phone.errors?.['required']">missing phone</div>
          </div>
       </div>
       <div>
          <div>Address:</div>
          <input type="text" formControlName="address" />
          <div *ngIf="ngForm.submitted && editForm.controls.address.errors" class="invalid">
-            <div *ngIf="editForm.controls.address.errors.required">missing address</div>
+            <div *ngIf="editForm.controls.address.errors?.['required']">missing address</div>
          </div>
       </div>
       <div>
