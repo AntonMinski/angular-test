@@ -2,7 +2,7 @@
  * Tenant data model
  */
 export interface Tenant {
-   id: string
+   _id: string
    name: string
    phone: string
    address: string

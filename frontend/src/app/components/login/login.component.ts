@@ -6,7 +6,6 @@ import { AppRoutingModule } from '../../app-routing.module';
 import {Router} from "@angular/router"
 
 
-
 @Component({
    selector: 'login',
    templateUrl: './login.component.html',
@@ -29,24 +28,17 @@ export class LoginComponent implements OnInit {
       }
 
       // TODO: connect to backend
-     const val = this.loginForm.value;
+     const form = this.loginForm.value;
 
-     this.authService.login(val.email, val.password).subscribe(
+     this.authService.login(form.email, form.password).subscribe(
          async (data) => {
-           console.log('data', data);
            this.tokenStorage.saveToken(data.token);
            this.tokenStorage.saveUser(data.user);
 
-           // this.isLoginFailed = false;
-           // this.isLoggedIn = true;
-           // this.roles = this.tokenStorage.getUser().roles;
-           // this.reloadPage();
            await this.router.navigate(['/main']);
          },
          err => {
-           console.log('authService', err);
-           // this.errorMessage = err.error.message;
-           // this.isLoginFailed = true;
+           console.log('authService error', err);
          }
        );
 

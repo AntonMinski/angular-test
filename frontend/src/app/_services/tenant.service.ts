@@ -1,28 +1,38 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http'
+import { from, map, Observable } from 'rxjs'
+import { Tenant } from '../models/tenant.model'
 
 const API_URL = 'http://localhost:3000/api/tenants/';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-export class UserService {
-  constructor(private http: HttpClient) { }
-
-  getPublicContent(): Observable<any> {
-    return this.http.get(API_URL + 'all', { responseType: 'text' });
+export class TenantService {
+  constructor(private http: HttpClient) {
   }
 
-  getUserBoard(): Observable<any> {
-    return this.http.get(API_URL + 'user', { responseType: 'text' });
+  findTenants(filter = ''): Observable<Tenant[]> {
+    return from(this.http.get(API_URL + filter)) as Observable<Tenant[]>;
   }
 
-  getModeratorBoard(): Observable<any> {
-    return this.http.get(API_URL + 'mod', { responseType: 'text' });
+  createTenant(tenant: Tenant): Observable<Tenant> {
+    return from(this.http.post(API_URL, tenant)) as Observable<Tenant>;
   }
 
-  getAdminBoard(): Observable<any> {
-    return this.http.get(API_URL + 'admin', { responseType: 'text' });
+  findTenantById(id: string): Observable<Tenant> {
+    return from(this.http.get(API_URL + id)) as Observable<Tenant>;
   }
+
+  updateTenant(tenant: Tenant): Observable<Tenant> {
+    return from(this.http.put(API_URL + tenant._id, tenant)) as Observable<Tenant>;
+  }
+
+  deleteTenant(id: string): Observable<Tenant> {
+    return from(this.http.delete(API_URL + id)) as Observable<Tenant>;
+  }
+
+
+
+
 }

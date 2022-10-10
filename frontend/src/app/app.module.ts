@@ -13,26 +13,37 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
 import { LoginComponent } from './components/login/login.component'
-import { EditDialog, MainComponent } from './components/main/main.component'
+import { EditDialog, MainComponent, ConfirmationDialog } from './components/main/main.component'
+import { MatSortModule } from '@angular/material/sort';
+import { MatPaginatorModule } from '@angular/material/paginator';
+
+import { MatTableModule } from '@angular/material/table';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+
 
 @NgModule({
-   declarations: [AppComponent, LoginComponent, MainComponent, EditDialog],
-   imports: [
-      BrowserModule,
-      AppRoutingModule,
-      FormsModule,
-      ReactiveFormsModule,
-      HttpClientModule,
-      BrowserAnimationsModule,
-      MatButtonModule,
-      MatSnackBarModule,
-      MatCardModule,
-      MatDialogModule,
-      MatInputModule,
-      MatSelectModule,
-      MatIconModule,
-   ],
-   providers: [],
-   bootstrap: [AppComponent],
+  declarations: [AppComponent, LoginComponent, MainComponent, EditDialog, ConfirmationDialog],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    FormsModule,
+    ReactiveFormsModule,
+    HttpClientModule,
+    BrowserAnimationsModule,
+    MatButtonModule,
+    MatSnackBarModule,
+    MatCardModule,
+    MatDialogModule,
+    MatInputModule,
+    MatSelectModule,
+    MatIconModule,
+    MatSortModule,
+    MatPaginatorModule,
+    MatProgressSpinnerModule,
+    MatTableModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule {
+}

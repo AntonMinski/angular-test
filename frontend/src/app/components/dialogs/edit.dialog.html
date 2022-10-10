@@ -10,7 +10,7 @@
       </div>
       <div>
          <div>Phone:</div>
-         <input type="number" formControlName="phone" />
+         <input type="text" formControlName="phone" />
          <div *ngIf="ngForm.submitted && editForm.controls.phone.errors" class="invalid">
             <div *ngIf="editForm.controls.phone.errors?.['required']">missing phone</div>
          </div>

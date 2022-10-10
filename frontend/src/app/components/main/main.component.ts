@@ -1,13 +1,23 @@
-import { Component, Inject, OnInit } from '@angular/core'
+import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core'
 import { FormBuilder, Validators } from '@angular/forms'
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
-import { BehaviorSubject } from 'rxjs'
+import { BehaviorSubject, debounceTime, distinctUntilChanged, fromEvent, tap } from 'rxjs'
 import { Tenant } from 'src/app/models/tenant.model'
+import { TenantDataSource } from '../../dataSources/tenant.dataSource'
+import { TenantService } from '../../_services/tenant.service'
+import { AuthService } from '../../_services/auth.service'
+import { Router } from '@angular/router'
 
 export interface EditDialogMode {
    mode: 'add' | 'edit'
    tenant: Tenant
 }
+
+export interface ConfirmationDialogMode {
+    text: string
+}
+
+
 
 @Component({
    selector: 'main',
@@ -20,15 +30,40 @@ export class MainComponent implements OnInit {
 
    searchText = ''
    filterMode: 'all' | 'debt' | 'clear' = 'all'
+   filter: string = '';
+
    private _rows = new BehaviorSubject<Tenant[]>([])
    rows = this._rows.asObservable()
 
-   constructor(public dialog: MatDialog) {}
+   dataSource: any;
+   displayedColumns: string[] = ['name', 'phone', 'address', 'debt', 'actions'];
+
+   @ViewChild('input') input: any;
+
+
+   constructor(public dialog: MatDialog, private tenantService: TenantService, private authService: AuthService,
+               private router: Router) {}
 
    ngOnInit() {
       this.email = localStorage.getItem('email')
-      this.getTenants()
+      this.dataSource = new TenantDataSource(this.tenantService);
+      this.dataSource.loadTenants()
    }
+
+  ngAfterViewInit() {
+    // server-side search
+    this.input.nativeElement.value = ''
+
+    fromEvent(this.input.nativeElement, 'keyup')
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        tap(() => {
+          this.applyFilter();
+        })
+      )
+      .subscribe()
+  }
 
    /* user actions */
    add() {
@@ -50,67 +85,67 @@ export class MainComponent implements OnInit {
          .toPromise()
          .then((data) => {
             if (data) {
-               data.id = tenant.id
+               data._id = tenant._id
                this.updateTenant(data)
             }
          })
    }
 
-   delete(tenant: Tenant) {
-      this.deleteTenant(tenant.id)
+   delete(id: string) {
+     this.dialog
+       .open(ConfirmationDialog )
+       .afterClosed()
+       .toPromise()
+       .then((data) => {
+         if (data.delete) {
+           this.deleteTenant(id)
+         }
+       })
    }
 
    /* auxiliaries */
-   onChange() {
-      const filtered = this.tenants.filter((t) => {
-         // check search criteria
-         if (
-            !t.name.includes(this.searchText) &&
-            !t.phone.includes(this.searchText) &&
-            !t.address.includes(this.searchText)
-         ) {
-            return false
-         }
-
-         // filter by debt selection mode
-         switch (this.filterMode) {
-            case 'clear':
-               return t.debt <= 0
-            case 'debt':
-               return t.debt > 0
-            default:
-               return true
-         }
-      })
-
-      this._rows.next(filtered)
+   applyFilter() {
+     this.filter = '';
+     this.filter += '?debt=' + this.filterMode;
+     if (this.searchText) {
+       this.filter += `&search=${this.searchText}`;
+     }
+     this.getTenants(this.filter)
    }
 
    /* _services */
-   getTenants() {
+   getTenants(filter = '') {
       // TODO: connect to backend
+     this.dataSource.loadTenants(filter)
    }
 
    addTenant(tenant: Tenant) {
       // TODO: connect to backend
+     this.dataSource.createTenant(tenant)
    }
 
    updateTenant(tenant: Tenant) {
       // TODO: connect to backend
+     this.dataSource.updateTenant(tenant)
    }
 
    deleteTenant(id: string) {
       // TODO: connect to backend
+      this.dataSource.deleteTenant(id)
    }
 
-   logout() {
+   async logout() {
       // TODO: connect to backend
+     this.authService.logout()
+      localStorage.removeItem('email')
+     await this.router.navigate(['/login']);
    }
 }
 
 @Component({
    selector: 'edit-dialog',
-   templateUrl: 'edit.dialog.html',
+   templateUrl: '../dialogs/edit.dialog.html',
+   styleUrls: ['../dialogs/edit.dialog.scss'],
 })
 export class EditDialog {
    name = ''
@@ -155,4 +190,30 @@ export class EditDialog {
    cancel() {
       this.editDialog.close()
    }
+}
+
+@Component({
+  selector: 'confirmation-dialog',
+  templateUrl: '../dialogs/confirmation.dialog.html',
+  styleUrls: ['../dialogs/confirmation.dialog.scss'],
+})
+export class ConfirmationDialog {
+
+  constructor(
+    public formBuilder: FormBuilder,
+    public confirmationDialog: MatDialogRef<ConfirmationDialog>,
+    @Inject(MAT_DIALOG_DATA) public data: ConfirmationDialogMode
+  ) {}
+
+  delete() {
+    this.confirmationDialog.close({
+      delete: true
+    })
+  }
+
+  cancel() {
+    this.confirmationDialog.close({
+      delete: false
+    })
+  }
 }
